@@ -1,0 +1,13 @@
+[Unit]
+Description=GPU-temperature fan control (Dell R620 + passed-through Tesla P4)
+After=pve-guests.service
+
+[Service]
+EnvironmentFile=-/etc/default/p4-fan
+ExecStart=/usr/local/bin/p4-fan.sh
+ExecStopPost=/usr/bin/ipmitool raw 0x30 0x30 0x01 0x01
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

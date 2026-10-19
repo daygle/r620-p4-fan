@@ -1,0 +1,16 @@
+# /etc/default/p4-fan - settings for p4-fan.service
+# After editing: systemctl restart p4-fan
+
+# Proxmox VM ID the GPU is passed through to (needs the QEMU guest agent).
+VMID=100
+
+# Quiet (night) curve from QUIET_FROM:00 until QUIET_UNTIL:00, host local time.
+QUIET_FROM=20
+QUIET_UNTIL=7
+
+# Any IPMI temperature sensor (CPUs, exhaust) at or above this hands the fans
+# back to iDRAC automatic control.
+SYSTEM_MAX=75
+
+# Seconds between checks.
+INTERVAL=30
