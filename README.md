@@ -63,10 +63,7 @@ server suddenly gets loud, the script is not in control: check
    /opt/r620-p4-fan/install.sh
    ```
 
-   Proxmox does not ship `git`, hence the first line. The repo is private:
-   the clone asks for your GitHub username and, as the password, a personal
-   access token (github.com → Settings → Developer settings → Fine-grained
-   tokens, read-only *Contents* on this repo).
+   Proxmox does not ship `git`, hence the first line.
 
    The repo must live at **`/opt/r620-p4-fan`**: the service runs
    `p4-fan.sh` from there, and `install.sh` refuses to run anywhere else.
