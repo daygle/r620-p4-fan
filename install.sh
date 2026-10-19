@@ -1,14 +1,17 @@
 #!/bin/bash
-# Installs p4-fan on the Proxmox HOST (run as root from this repo's folder).
+# Installs p4-fan on the Proxmox HOST (run as root). The repo must be cloned
+# to /opt/r620-p4-fan: the service runs p4-fan.sh from there.
 # Prerequisite in the GPU VM:
 #   apt install qemu-guest-agent && systemctl enable --now qemu-guest-agent
 set -euo pipefail
+INSTALL_DIR=/opt/r620-p4-fan
 cd "$(dirname "$0")"
 say()  { printf '\n== %s\n' "$*"; }
 fail() { printf '\n!! %s\n' "$*" >&2; exit 1; }
 
 [ "$(id -u)" -eq 0 ] || fail "run as root on the Proxmox host"
 command -v qm >/dev/null || fail "qm not found: this is not the Proxmox host"
+[ "$(pwd -P)" = "$INSTALL_DIR" ] || fail "clone this repo to $INSTALL_DIR and run $INSTALL_DIR/install.sh"
 
 if [ ! -f /etc/default/p4-fan ]; then
   install -m 644 p4-fan.default /etc/default/p4-fan
@@ -39,13 +42,15 @@ t=$(qm guest exec "$VMID" --timeout 10 -- nvidia-smi --query-gpu=temperature.gpu
 [ -n "$t" ] || fail "could not read the GPU temp. In VM $VMID run: apt install qemu-guest-agent && systemctl enable --now qemu-guest-agent"
 echo "GPU is ${t}C"
 
-say "Installing the script and service"
-install -m 755 p4-fan.sh /usr/local/bin/p4-fan.sh
+say "Installing the service (runs $INSTALL_DIR/p4-fan.sh)"
+chmod 755 p4-fan.sh
 install -m 644 p4-fan.service /etc/systemd/system/p4-fan.service
+# Older one-shot installs copied the script here; the service no longer uses it.
+rm -f /usr/local/bin/p4-fan.sh
 systemctl daemon-reload
 systemctl enable p4-fan >/dev/null
 systemctl restart p4-fan
 sleep 5
 systemctl --no-pager --lines=0 status p4-fan || true
 journalctl -t p4-fan -n 5 --no-pager || true
-say "Done. Watch it with: journalctl -t p4-fan -f   Undo with: ./uninstall.sh"
+say "Done. Watch it with: journalctl -t p4-fan -f   Undo with: $INSTALL_DIR/uninstall.sh"
