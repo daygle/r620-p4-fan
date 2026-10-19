@@ -58,16 +58,18 @@ server suddenly gets loud, the script is not in control: check
 2. On the Proxmox host, as root:
 
    ```bash
-   git clone https://github.com/daygle/r620-p4-fan.git
-   cd r620-p4-fan
-   ./install.sh
+   git clone https://github.com/daygle/r620-p4-fan.git /opt/r620-p4-fan
+   /opt/r620-p4-fan/install.sh
    ```
+
+   The repo must live at **`/opt/r620-p4-fan`**: the service runs
+   `p4-fan.sh` from there, and `install.sh` refuses to run anywhere else.
 
    The installer creates `/etc/default/p4-fan`, installs `ipmitool` and `jq`,
    loads the IPMI modules, enables the guest agent option on the VM, checks it
    can read both the server's sensors and the GPU, then installs and starts
    the service. If it has to enable the guest agent option, shut the VM down
-   fully, start it again, and re-run `./install.sh`.
+   fully, start it again, and run `install.sh` again.
 
 3. Watch it:
 
@@ -88,15 +90,19 @@ Edit `/etc/default/p4-fan`, then `systemctl restart p4-fan`:
 | `INTERVAL` | `30` | Seconds between checks |
 
 The curves are `day_curve` and `quiet_curve` in `p4-fan.sh`. Change the
-percentages there and re-run `./install.sh`. Some R620s report fan warnings
+percentages there and run `systemctl restart p4-fan`. Some R620s report fan warnings
 below about 12-15%.
 
 ## Update / uninstall
 
 ```bash
+cd /opt/r620-p4-fan
 git pull && ./install.sh     # update (keeps /etc/default/p4-fan)
-./uninstall.sh               # remove; fans back to iDRAC
+./uninstall.sh               # remove the service; fans back to iDRAC
 ```
+
+`uninstall.sh` leaves `/opt/r620-p4-fan` and `/etc/default/p4-fan` in place;
+delete them yourself if you no longer want them.
 
 ## Manual fan commands
 
