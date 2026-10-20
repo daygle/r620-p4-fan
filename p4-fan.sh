@@ -49,8 +49,8 @@ day_curve() {     # GPU C -> fan %
 
 quiet_curve() {   # GPU C -> fan %, quieter; top steps protect the card
   local t=$1
-  if   [ "$t" -ge 82 ]; then echo 60
-  elif [ "$t" -ge 78 ]; then echo 45
+  if   [ "$t" -ge 82 ]; then echo 40
+  elif [ "$t" -ge 78 ]; then echo 35
   elif [ "$t" -ge 74 ]; then echo 30
   elif [ "$t" -ge 68 ]; then echo 25
   elif [ "$t" -ge 62 ]; then echo 20
